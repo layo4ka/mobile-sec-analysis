@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Mobile Security Service</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    </head>
+    <body>
+        <div class="container" id="app">
+            <div class="page-header">
+                <header class="centered-title">Проверь приложение на вирусняк прямо сейчас!</header>
+            </div>
+            <div class="working-space">
+                <h1 class="error-text">
+                    ${ errorText }
+                </h1>
+                <input id="fileInput" type="file" accept=".apk,.ipa" @change="chooseFile">
+                    <button class="circle-button-main" onclick="fileInput.click()">
+                        <h1 class="main-button-text">Выбрать файл</h1>
+                    </button>
+                <button class="circle-button-load" type="submit" @click="uploadFile">
+                    <h1 class="main-button-text">Загрузить</h1>
+                </button>
+                <div class="status-text">
+                    <h1 v-if="fileName!=''">
+                       ${fileName} - ${uploadStatus}
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        const App = Vue.createApp({
+            data(){
+                return{ 
+                    selectedFile: null,
+                    errorText: '',
+                    fileName: '',
+                    uploadStatus: ''
+                };
+            },
+            delimiters: ['${', '}'],
+            methods: {
+                chooseFile(event){
+                    this.selectedFile = event.target.files[0];
+                    this.fileName = this.selectedFile.name;
+                    this.uploadStatus = 'Ждёт загрузки'
+                },
+                async uploadFile(){
+                    let flag = true;
+                    this.uploadStatus = 'загружает...'
+                    if(!this.selectedFile){
+                        this.errorText = 'Ну файл-то выбери... Чо я проверять буду?'
+                        return;
+                    }
+                    try{
+                        let formData = new FormData()
+                        formData.append('file', this.selectedFile)
+                        const response = await axios.post('/upload/', formData, {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                                "X-CSRFToken": "{{ csrf_token }}"
+                            }
+                        });
+                        this.uploadStatus = 'Загрузил!';
+                        console.log(response);
+                        return response;
+                    }
+                    catch (error) {
+                        flag = false
+                        this.errorText = 'Произошла ошибочка ёлки-иголки...'
+                        console.log(error);
+                    }
+                },
+
+            }
+        })
+        App.mount('#app');
+        
+            
+    </script>
+
+    <style lang="scss">
+        @import 'https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css';
+        #fileInput{
+            display: none;
+        }
+        body{
+        background-color: #3f3939;
+        background-position: center;
+        background-size: cover;
+        height: 100%;
+        }
+        .main-button-text{
+        font-size: 2rem;
+        font-weight: 600;
+        color: rgb(197, 197, 197);
+        }
+        .circle-button-main{
+        width: 300px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #355736;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #518975d2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transition: all 0.3s ease;
+        transform: scale(1);
+        }
+        .circle-button-main:hover{
+        width: 300px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #548d58;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #75c7acd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(1.1);
+        }
+        .circle-button-main:active{
+        width: 300px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #264028;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #33574bd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(0.8);
+        }
+
+        .circle-button-load{
+        width: 200px;
+        height: 100px;
+        border-width: 0.5em;
+        border-color: #355736;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #518975d2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transition: all 0.3s ease;
+        transform: scale(1);
+        }
+        .circle-button-load:hover{
+        width: 200px;
+        height: 100px;
+        border-width: 0.5em;
+        border-color: #548d58;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #75c7acd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(1.1);
+        }
+        .circle-button-load:active{
+        width: 200px;
+        height: 100px;
+        border-width: 0.5em;
+        border-color: #264028;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #33574bd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(0.8);
+        }
+
+        .container{
+        background-color: #4f4c5a89;
+        width: 100vw;
+        height: 100vh;
+        display: grid;
+        justify-content: center;
+        column-count: 1;
+        row-gap: 1px;
+        }
+        .working-space{
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        place-items: center;
+        row-gap: 1px;
+        }
+
+        .centered-title{
+        text-align: center;
+        font-size: 3rem;
+        font-weight: 700;
+        color: aqua;
+        }
+        .status-text{
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 200;
+        color: rgb(255, 255, 255);
+        }
+        .error-text{
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 200;
+        color: rgb(137, 11, 11);
+        }
+    </style>
+</html>
