@@ -1,3 +1,4 @@
 {
-    "git.autoRepositoryDetection": false
+    "git.autoRepositoryDetection": false,
+    "python.envFile": "${workspaceFolder}/.venv"
 }
