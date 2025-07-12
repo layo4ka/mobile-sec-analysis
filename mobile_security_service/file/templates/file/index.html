@@ -20,12 +20,20 @@
                     <h1 class="settings-text">
                         ${ fileName }
                     </h1>
-                    <button class="circle-button-load" v-if="correctFormat==true" @click="uploadFile">
+                    <button class="circle-button-load" v-if="correctFormat==true && uploaded==false" @click="uploadFile">
                         <h1 class="main-button-text">Начать</h1>
                     </button>
                     <h1 class="error-text">
                         ${ errorText }
                     </h1>
+                </div>
+                <div class="results-panel" v-if="uploaded==true">
+                    <h1 class="settings-text">
+                        Анализ приложения ${ fileName }:
+                    </h1>
+                    <p class="settings-text">
+                        Bin length: ${ analyzeResults }
+                    </p>
                 </div>
             </div>
         </div>
@@ -41,7 +49,11 @@
                     selectedFile: null,
                     errorText: '',
                     fileName: '',
-                    correctFormat: false
+                    correctFormat: false,
+                    analyzeDone: false,
+                    uploaded: false,
+
+                    analyzeResults: ''
                 };
             },
             delimiters: ['${', '}'],
@@ -79,12 +91,14 @@
                             }
                         });
                         this.uploaded = true;
+                        window.scrollBy({top: 40, behavior: 'smooth'});
                         console.log(response.data);
+                        this.analyzeResults = response.data.result;
                         return response;
                     }
                     catch (error) {
                         flag = false
-                        this.errorText = 'Произошла ошибочка ёлки-иголки...'
+                        this.errorText = 'Произошла непредвиденная ошибка!'
                         console.log(error);
                     }
                 },
@@ -92,8 +106,6 @@
             }
         })
         App.mount('#app');
-        
-            
     </script>
 
     <style lang="scss">
@@ -110,7 +122,7 @@
         .main-button-text{
         font-size: 2rem;
         font-weight: 600;
-        color: rgb(197, 197, 197);
+        color: rgb(255, 255, 255);
         }
         .circle-button-main{
         width: 300px;
@@ -253,5 +265,18 @@
             font-weight: 500;
             color: rgb(234, 234, 234);
         }
+        .results-panel{
+            width: 600px;
+            height: 800px;
+            border-width: 0.3em;
+            border-color: rgb(38, 38, 38);
+            border-style: solid;
+            border-radius: 30px;
+            background-color: #a0a0a0b7;
+            display: grid;
+            align-items: center;
+            place-items: top;
+        }
+        
     </style>
 </html>

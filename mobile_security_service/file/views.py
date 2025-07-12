@@ -18,9 +18,9 @@ def upload_file(request):
         if(form.is_valid()):
             analysis = form.save(commit=False)
             analysis.save()
-            toRespond = {'status':'pending', 'results':''}
-            print(analysis.file.path)
-            process_file_async.delay('uploads/test.apk', toRespond)
-            return JsonResponse({"status":toRespond['status'], "results":toRespond['results']})
+            respnd=process_file_async.delay(analysis.file.path).get()
+            return JsonResponse({"result":respnd})
         else:
             return JsonResponse({"error":form.errors})
+def some_page(request):
+    return JsonResponse({"shit":"shitty"})

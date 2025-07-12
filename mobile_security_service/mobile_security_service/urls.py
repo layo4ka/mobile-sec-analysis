@@ -5,6 +5,7 @@ from file import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('upload/', views.upload_file, name='upload'),
+    path('shitty/', views.some_page, name='shitty'),
     path('admin/', admin.site.urls),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/', include('djoser.urls.authtoken'))
