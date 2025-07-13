@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!jbtz^4xv76sk*5n%fgu$uz)yu!qss1pu+=m9p0n6z9o@ur_*y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['host.docker.internal', 'localhost']
 
 
 # Application definition
@@ -148,3 +148,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_EXTENDED = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+MOBSF_URL = "http://localhost:8001"

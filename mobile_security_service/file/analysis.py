@@ -1,8 +1,8 @@
 import requests
 import json
 
-MOBSF_URL = "http://localhost:8000"
-API_KEY = "0881f8b9935920c129af3664cf05a4ce77ac89bba7f3643fd09025caced57faa"
+MOBSF_URL = "http://localhost:8001"
+API_KEY = "abf1e023d641ec0f8d1c5d1e723fb2e21d324ece74afd78d9d9bd354a110dc81"
 
 def upload_app(file_instance):
     headers = {"Authorization": API_KEY}
@@ -14,7 +14,8 @@ def upload_app(file_instance):
         result = response.json()
         file_hash = result.get("hash")
         return file_hash
-    return "Ошибка"
+    else:
+        return f"Ошибка {response.status_code}"
 
 def static_analysis(file_hash):
     headers = {"Authorization": API_KEY}

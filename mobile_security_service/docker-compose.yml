@@ -2,7 +2,12 @@ services:
   django:
     build: .
     container_name: django
-    command: python manage.py runserver 0.0.0.0:8000
+    command: 
+      - sh
+      - -c
+      - |
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
@@ -13,17 +18,23 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
   
-  # mobsf:
-  #   image: opensecurity/mobile-security-framework-mobsf:latest
-  #   container_name: mobsf
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8001:8000"
-  #   volumes:
-  #     - mobsf_data:/home/mobsf/.MobSF
-  #     - mobsf_uploads:/home/mobsf/MobSF/uploads
-  #   depends_on:
-  #     - redis
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:latest
+    container_name: mobsf
+    restart: unless-stopped
+    environment:
+      - MOBSF_API_KEY=abf1e023d641ec0f8d1c5d1e723fb2e21d324ece74afd78d9d9bd354a110dc81
+      - MOBSF_ADMIN_USER=admin
+      - MOBSF_ADMIN_PASSWORD=admin123
+
+    ports:
+      - "8001:8000"
+    volumes:
+      - mobsf_data:/home/mobsf/.MobSF
+      - mobsf_uploads:/home/mobsf/MobSF/uploads
+    depends_on:
+      - redis
+
   celery:
     build: .
     container_name: celery

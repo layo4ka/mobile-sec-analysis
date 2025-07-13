@@ -1,6 +1,6 @@
 from celery import shared_task
 import celery.worker
-from .analysis import analyze_app
+from .analysis import upload_app
 from .models import UploadFile
 from celery import Celery
 from django.apps import apps
@@ -11,7 +11,7 @@ from celery.utils.log import get_task_logger
 @shared_task()
 def process_file_async(analysisFilePath):
     file = default_storage.open(analysisFilePath, "rb")
-    result = analyze_app(file)
+    result = upload_app(file)
     return result
         
     
