@@ -15,8 +15,10 @@ services:
     depends_on:
       - redis
       - celery
+      - mobsf
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
+      - MOBSF_URL=http://mobsf:8000
   
   mobsf:
     image: opensecurity/mobile-security-framework-mobsf:latest
@@ -44,6 +46,7 @@ services:
     depends_on:
       - redis
     environment:
+      - MOBSF_URL=http://mobsf:8000
       - CELERY_BROKER_URL=redis://redis:6379/0
 
   celery-beat:
@@ -55,6 +58,7 @@ services:
     depends_on:
       - redis
     environment:
+      - MOBSF_URL=http://mobsf:8000
       - CELERY_BROKER_URL=redis://redis:6379/0
 
   flower:
@@ -69,6 +73,7 @@ services:
       - redis
       - celery
     environment:
+      - MOBSF_URL=http://mobsf:8000
       - CELERY_BROKER_URL=redis://redis:6379/0
 
   redis:

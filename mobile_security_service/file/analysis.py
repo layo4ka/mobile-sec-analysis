@@ -1,7 +1,7 @@
 import requests
 import json
 
-MOBSF_URL = "http://localhost:8001"
+MOBSF_URL = "http://mobsf:8000"
 API_KEY = "abf1e023d641ec0f8d1c5d1e723fb2e21d324ece74afd78d9d9bd354a110dc81"
 
 def upload_app(file_instance):
