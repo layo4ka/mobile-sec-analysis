@@ -10,7 +10,7 @@ from celery.utils.log import get_task_logger
 
 @shared_task()
 def process_file_async(analysisFilePath):
-    file = default_storage.open(analysisFilePath)
+    file = default_storage.open(analysisFilePath, "rb")
     result = analyze_app(file)
     return result
         

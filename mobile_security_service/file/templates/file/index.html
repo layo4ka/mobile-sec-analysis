@@ -16,24 +16,29 @@
                     <button class="circle-button-main" onclick="fileInput.click()">
                         <h1 class="main-button-text">Выбрать файл</h1>
                     </button>
-                <div class="file-panel">
+                <div class="file-panel" v-if="fileName!=''">
                     <h1 class="settings-text">
                         ${ fileName }
                     </h1>
-                    <button class="circle-button-load" v-if="correctFormat==true && uploaded==false" @click="uploadFile">
+                    <button class="circle-button-load" v-if="correctFormat==true && uploaded==false && processing==false" @click="uploadFile">
                         <h1 class="main-button-text">Начать</h1>
                     </button>
+                    <h1 class="settings-text" v-if="processing==true">
+                        Анализируем приложение...
+                    </h1>
                     <h1 class="error-text">
                         ${ errorText }
                     </h1>
                 </div>
-                <div class="results-panel" v-if="uploaded==true">
+                <div class="results-panel" v-if="uploaded==true && processing==false">
                     <h1 class="settings-text">
                         Анализ приложения ${ fileName }:
                     </h1>
-                    <p class="settings-text">
-                        Bin length: ${ analyzeResults }
-                    </p>
+                    <div class="analysis-data-panel">
+                        <p class="settings-text-output">
+                            Bin length: ${ analyzeResults }
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,6 +57,7 @@
                     correctFormat: false,
                     analyzeDone: false,
                     uploaded: false,
+                    processing: false,
 
                     analyzeResults: ''
                 };
@@ -77,6 +83,7 @@
                 },
                 async uploadFile(){
                     let flag = true;
+                    this.processing = true;
                     if(!this.selectedFile){
                         this.errorText = 'Ну файл-то выбери... Чо я проверять буду?'
                         return;
@@ -91,6 +98,7 @@
                             }
                         });
                         this.uploaded = true;
+                        this.processing = false
                         window.scrollBy({top: 40, behavior: 'smooth'});
                         console.log(response.data);
                         this.analyzeResults = response.data.result;
@@ -113,11 +121,12 @@
         #fileInput{
             display: none;
         }
-        body{
+        html, body{
         background-color: #3f3939;
         background-position: center;
         background-size: cover;
         height: 100%;
+        margin: 0;
         }
         .main-button-text{
         font-size: 2rem;
@@ -213,9 +222,8 @@
         }
 
         .container{
-        background-color: #4f4c5a89;
         width: 100vw;
-        height: 100vh;
+        height: 100%;
         display: grid;
         justify-content: center;
         column-count: 1;
@@ -265,6 +273,12 @@
             font-weight: 500;
             color: rgb(234, 234, 234);
         }
+        .settings-text-output{
+            text-align: left;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: rgb(234, 234, 234);
+        }
         .results-panel{
             width: 600px;
             height: 800px;
@@ -274,9 +288,17 @@
             border-radius: 30px;
             background-color: #a0a0a0b7;
             display: grid;
-            align-items: center;
+            align-items: top;
             place-items: top;
         }
+        .analysis-data-panel{
+            width: 600px;
+            height: 800px;
+            display: grid;
+            align-items: left;
+            place-items: left;
+        }
+        
         
     </style>
 </html>
