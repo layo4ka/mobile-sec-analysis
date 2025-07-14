@@ -36,8 +36,11 @@
                     </h1>
                     <div class="analysis-data-panel">
                         <p class="settings-text-output">
-                            Bin length: ${ analyzeResults }
+                            <!-- ${ analyzeResults } -->
                         </p>
+                        <button class="circle-button-download" v-if="analyzeDone==true">
+                            <h1 class="main-button-text">Скачать отчёт PDF</h1>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -98,10 +101,11 @@
                             }
                         });
                         this.uploaded = true;
-                        this.processing = false
+                        this.processing = false;
                         window.scrollBy({top: 40, behavior: 'smooth'});
                         console.log(response.data);
                         this.analyzeResults = response.data.result;
+                        this.analyzeDone = true;
                         return response;
                     }
                     catch (error) {
@@ -221,6 +225,51 @@
         transform: scale(0.8);
         }
 
+        .circle-button-download{
+        width: 250px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #355736;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #518975d2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transition: all 0.3s ease;
+        transform: scale(1);
+        }
+        .circle-button-download:hover{
+        width: 250px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #548d58;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #75c7acd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(1.1);
+        }
+        .circle-button-download:active{
+        width: 250px;
+        height: 150px;
+        border-width: 0.5em;
+        border-color: #264028;
+        border-style: solid;
+        border-radius: 30px;
+        background-color: #33574bd2;
+        font-size: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        transform: scale(0.8);
+        }
+
+
         .container{
         width: 100vw;
         height: 100%;
@@ -280,7 +329,7 @@
             color: rgb(234, 234, 234);
         }
         .results-panel{
-            width: 600px;
+            width: 700px;
             height: 800px;
             border-width: 0.3em;
             border-color: rgb(38, 38, 38);
