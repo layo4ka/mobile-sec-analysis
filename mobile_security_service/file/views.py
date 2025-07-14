@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .task import process_file_async
+from django.views.decorators.cache import cache_control
 
 def index(request):
     form = UploadFileForm()
@@ -22,5 +23,10 @@ def upload_file(request):
             return JsonResponse({"result":respnd})
         else:
             return JsonResponse({"error":form.errors})
+        
+@cache_control(private=True)
+def download_pdf_scan_results(request):
+    pass
+
 def some_page(request):
     return JsonResponse({"shit":"shitty"})

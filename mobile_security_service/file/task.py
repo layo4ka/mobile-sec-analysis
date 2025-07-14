@@ -16,7 +16,9 @@ def process_file_async(analysisFilePath):
     analysis_status = static_analysis(file_hash)
     report = get_results_report(analysis_status, file_hash)
     scan_results=get_scan_results(analysis_status, file_hash)
+
     result+=report
-    return result
+    return f"Длина JSON результата (пока нормально отображение не сделал): {len(result)}"
+
         
     

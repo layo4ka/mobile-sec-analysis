@@ -38,7 +38,7 @@
                         <p class="settings-text-output">
                             <!-- ${ analyzeResults } -->
                         </p>
-                        <button class="circle-button-download" v-if="analyzeDone==true">
+                        <button class="circle-button-download" v-if="analyzeDone==true" @click="DownloadPDFResults">
                             <h1 class="main-button-text">Скачать отчёт PDF</h1>
                         </button>
                     </div>
@@ -114,6 +114,9 @@
                         console.log(error);
                     }
                 },
+                DownloadPDFResults(){
+                    
+                }
 
             }
         })
