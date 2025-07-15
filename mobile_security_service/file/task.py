@@ -7,6 +7,19 @@ from django.apps import apps
 from django.core.files.storage import default_storage
 import celery
 from celery.utils.log import get_task_logger
+from androguard.core.bytecodes.apk import APK
+from django.core.exceptions import ValidationError
+
+# Ставим сюда, чтобы проверить файл ДО загрузки
+file.seek(0)  # на всякий случай вернём курсор в начало
+try:
+    apk = APK(file.read())
+    # тут можно добавить дополнительные проверки, например:
+    # if not apk.is_valid_APK(): raise ValidationError("Не APK")
+except Exception:
+    raise ValidationError("Файл не похож на APK")
+file.seek(0)  # снова вернём курсор в начало, чтобы upload_file() его прочитал правильно
+
 
 @shared_task()
 def process_file_async(analysisFilePath):
