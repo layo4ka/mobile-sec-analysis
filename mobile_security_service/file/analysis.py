@@ -35,9 +35,29 @@ def get_results_report(status, file_hash):
         toPost = {"hash":file_hash}
         response = requests.post(uploadURL, data=toPost, headers=headers)
         if response.status_code == 200:
+            respJson = response.json()
+            result={}
             return response.text
+            result['general_info'] = {
+                "Название приложения":respJson['app_name'],
+                "Имя пакета":respJson['package_name'],
+                "Размер приложения":respJson['size'],
+                "Основная активность":respJson['main_activity'],
+                "Версия":respJson['version']
+            }
+            services={}
+            for i in range(len(respJson['services'])):
+                services.update({f"{i+1})":f"{respJson['services'][i]}"})
+            result['services']=services
+            permissions={}
+            for x in respJson['permissions']:
+                perm={"Имя разрешения":respJson['permissions'].get(x), "Безопасность разрешения":respJson['permissions'].get(x).get('status')}
+                permissions.update(perm)
+            result['permissions']=permissions
+            
         else:
             return f"Ошибка: {response.status_code}; {response.text}"
+        
     else:
         return status
 def get_report_pdf(status, file_hash):

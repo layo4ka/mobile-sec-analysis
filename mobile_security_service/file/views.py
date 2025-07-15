@@ -24,9 +24,9 @@ def upload_file(request):
         else:
             return JsonResponse({"error":form.errors})
         
-@cache_control(private=True)
-def download_pdf_scan_results(request):
-    pass
+# @cache_control(private=True)
+# def download_pdf_scan_results(request):
+#     pass
 
 def some_page(request):
     return JsonResponse({"shit":"shitty"})
