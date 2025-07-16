@@ -20,7 +20,7 @@ def upload_file(request):
             analysis = form.save(commit=False)
             analysis.save()
             respnd=process_file_async.delay(analysis.file.path).get()
-            return JsonResponse({"result":respnd})
+            return JsonResponse({"analysis":respnd})
         else:
             return JsonResponse({"error":form.errors})
         

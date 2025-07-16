@@ -30,17 +30,12 @@
                         ${ errorText }
                     </h1>
                 </div>
-                <div class="results-panel" v-if="uploaded==true && processing==false">
+                <div class="results-panel" v-if="uploaded==true && processing==false" id="resultsPanel">
                     <h1 class="settings-text">
                         Анализ приложения ${ fileName }:
+                        ${analyzeResults}
                     </h1>
-                    <div class="analysis-data-panel" id="General">
-                        <h1 class="analysis-text-header">Общие данные приложения</h1>
-                        <p class="analysis-text-output">${analyzeResults}</p>
-                        <!-- <button class="circle-button-download" v-if="analyzeDone==true" @click="DownloadPDFResults">
-                            <h1 class="main-button-text">Скачать отчёт PDF</h1>
-                        </button> -->
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -61,7 +56,7 @@
                     uploaded: false,
                     processing: false,
 
-                    analyzeResults: ''
+                    analyzeResults: []
                 };
             },
             delimiters: ['${', '}'],
@@ -102,9 +97,12 @@
                         this.uploaded = true;
                         this.processing = false;
                         window.scrollBy({top: 40, behavior: 'smooth'});
-                        console.log(response.data);
-                        this.analyzeResults = response.data.result;
-                        this.analyzeDone = true;
+                        console.log(response.data.analysis);
+                        data=response.data.analysis;
+                        this.analyzeResults = data;                        
+                        for(const key in data){
+                            
+                        }
                         return response;
                     }
                     catch (error) {
@@ -119,7 +117,7 @@
 
             }
         })
-        App.mount('#app');
+        App.mount('#app'); 
     </script>
 
     <style lang="scss">

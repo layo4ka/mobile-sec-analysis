@@ -4,6 +4,18 @@ import json
 MOBSF_URL = "http://mobsf:8000"
 API_KEY = "abf1e023d641ec0f8d1c5d1e723fb2e21d324ece74afd78d9d9bd354a110dc81"
 
+#Для вывода
+def dict_to_strings(d, parent_key='', separator=':'):
+    result = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{separator}{k}" if parent_key else k
+        if isinstance(v, dict):
+            result.extend(dict_to_strings(v, new_key, separator))
+        else:
+            result.append(f"{new_key}{separator}{v}")
+    return result
+
+
 def upload_app(file_instance, path):
     headers = {"Authorization": API_KEY}
     uploadURL = f"{MOBSF_URL}/api/v1/upload"
@@ -26,7 +38,7 @@ def static_analysis(file_hash):
         return "Done"
     else:
         return f"Ошибка: {response.json}; {response.text}"
-    
+
 def get_results_report(status, file_hash):
     if(status == "Done"):
 
@@ -37,8 +49,8 @@ def get_results_report(status, file_hash):
         if response.status_code == 200:
             respJson = response.json()
             result={}
-            return response.text
-            result['general_info'] = {
+
+            result['Основная информация'] = {
                 "Название приложения":respJson['app_name'],
                 "Имя пакета":respJson['package_name'],
                 "Размер приложения":respJson['size'],
@@ -48,18 +60,33 @@ def get_results_report(status, file_hash):
             services={}
             for i in range(len(respJson['services'])):
                 services.update({f"{i+1})":f"{respJson['services'][i]}"})
-            result['services']=services
+            result['Сервисы']=services
             permissions={}
             for x in respJson['permissions']:
-                perm={"Имя разрешения":respJson['permissions'].get(x), "Безопасность разрешения":respJson['permissions'].get(x).get('status')}
+                perm={"Имя разрешения":x, "Безопасность разрешения":respJson['permissions'].get(x).get('status')}
                 permissions.update(perm)
-            result['permissions']=permissions
-            
+            result['Разрешения'].update(permissions)
+
+            trackers={}
+            trackers.update({"Всего трекеров":respJson['trackers']['total_trackers'], "Засечённых трекеров":respJson['trackers']['detected_trackers']})
+            for x in respJson['trackers']['trackers']:
+                tracker = {"Название":x['name'], "Категория":x['categories']}
+                trackers.update(tracker)
+            result['Трекеры']=trackers
+            appsec=respJson['appsec']   
+            result['Безопасность']={"Оценка безопасности":f"{appsec['security_score']}/100"}
+            if(f"{respJson['virus_total']}"=="null"):
+                result['Вирусы']={"Всего вирусов":0}
+            else:
+                result['Вирусы']={"Всего вирусов":respJson['virus_total']}
+            finalResult=dict_to_strings(result)
+
+            return finalResult
         else:
             return f"Ошибка: {response.status_code}; {response.text}"
-        
     else:
         return status
+
 def get_report_pdf(status, file_hash):
     if(status=="Done"):
         headers = {"Authorization": API_KEY}
