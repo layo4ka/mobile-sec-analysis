@@ -65,7 +65,7 @@ def get_results_report(status, file_hash):
             for x in respJson['permissions']:
                 perm={"Имя разрешения":x, "Безопасность разрешения":respJson['permissions'].get(x).get('status')}
                 permissions.update(perm)
-            result['Разрешения'].update(permissions)
+            result.setdefault('Разрешения', {}).update(permissions)
 
             trackers={}
             trackers.update({"Всего трекеров":respJson['trackers']['total_trackers'], "Засечённых трекеров":respJson['trackers']['detected_trackers']})

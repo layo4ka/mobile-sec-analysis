@@ -1,396 +1,152 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Mobile Security Service</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    </head>
-    <body>
-        <div class="container" id="app">
-            <div class="page-header">
-                <header class="centered-title">Проверь приложение на вирусняк прямо сейчас!</header>
-            </div>
-            <div class="working-space">
-                <input id="fileInput" type="file" accept=".apk,.ipa" @change="chooseFile">
-                    <button class="circle-button-main" onclick="fileInput.click()">
-                        <h1 class="main-button-text">Выбрать файл</h1>
-                    </button>
-                <div class="file-panel" v-if="fileName!=''">
-                    <h1 class="settings-text">
-                        ${ fileName }
-                    </h1>
-                    <button class="circle-button-load" v-if="correctFormat==true && uploaded==false && processing==false" @click="uploadFile">
-                        <h1 class="main-button-text">Начать</h1>
-                    </button>
-                    <h1 class="settings-text" v-if="processing==true">
-                        Анализируем приложение...
-                    </h1>
-                    <h1 class="error-text">
-                        ${ errorText }
-                    </h1>
-                </div>
-                <div class="results-panel" v-if="uploaded==true && processing==false" id="resultsPanel">
-                    <h1 class="settings-text">
-                        Анализ приложения ${ fileName }:
-                        ${analyzeResults}
-                    </h1>
-                    
-                </div>
-            </div>
-        </div>
-    </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobile Security Service</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    /* Общие стили */
+    html, body {
+      background-color: #3f3939;
+      height: 100%;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .centered-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: aqua;
+      margin-bottom: 2rem;
+    }
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    /* Кнопки */
+    #fileInput { display: none; }
+    .circle-button-main {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 300px;
+      height: 150px;
+      border: 0.5em solid #355736;
+      border-radius: 30px;
+      background-color: #518975d2;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      cursor: pointer;
+    }
+    .circle-button-main:hover {
+      transform: scale(1.05);
+      background-color: #75c7acd2;
+    }
 
-    <script>
-        const App = Vue.createApp({
-            data(){
-                return{ 
-                    selectedFile: null,
-                    errorText: '',
-                    fileName: '',
-                    correctFormat: false,
-                    analyzeDone: false,
-                    uploaded: false,
-                    processing: false,
+    /* Сообщения */
+    #message {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .error { color: #e74c3c; }
+    .success { color: #2ecc71; }
 
-                    analyzeResults: []
-                };
-            },
-            delimiters: ['${', '}'],
-            methods: {
-                chooseFile(event){
-                    this.selectedFile = event.target.files[0];
-                    if(!this.selectedFile){
-                        this.fileName = "";
-                        this.errorText = "Вы не выбрали файл!";
-                        this.correctFormat = false;
-                    }
-                    this.fileName = this.selectedFile.name;
-                    if(this.fileName.endsWith(".apk") || this.fileName.endsWith(".ipa")){
-                        this.correctFormat = true;
-                        this.errorText = "";
-                    }
-                    else{
-                        this.errorText = "Некорректный формат файла";
-                        this.correctFormat = false;
-                    }
-                },
-                async uploadFile(){
-                    let flag = true;
-                    this.processing = true;
-                    if(!this.selectedFile){
-                        this.errorText = 'Ну файл-то выбери... Чо я проверять буду?'
-                        return;
-                    }
-                    try{
-                        let formData = new FormData()
-                        formData.append('file', this.selectedFile)
-                        const response = await axios.post('/upload/', formData, {
-                            headers: {
-                                "Content-Type": "multipart/form-data",
-                                "X-CSRFToken": "{{ csrf_token }}"
-                            }
-                        });
-                        this.uploaded = true;
-                        this.processing = false;
-                        window.scrollBy({top: 40, behavior: 'smooth'});
-                        console.log(response.data.analysis);
-                        data=response.data.analysis;
-                        this.analyzeResults = data;                        
-                        for(const key in data){
-                            
-                        }
-                        return response;
-                    }
-                    catch (error) {
-                        flag = false
-                        this.errorText = 'Произошла непредвиденная ошибка!'
-                        console.log(error);
-                    }
-                },
-                DownloadPDFResults(){
-                    
-                }
+    /* Панель */
+    .working-space {
+      width: 100%;
+      background-color: #a0a0a0b7;
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="centered-title">Проверь приложение на вирусняк прямо сейчас!</div>
+    <div class="working-space">
+      <!-- Форма загрузки -->
+      <form id="uploadForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input id="fileInput" name="file" type="file" accept=".apk,.ipa">
+        <button type="button" class="circle-button-main" onclick="fileInput.click()">
+          Выбрать файл
+        </button>
+      </form>
 
-            }
-        })
-        App.mount('#app'); 
-    </script>
+      <!-- Сообщение о статусе -->
+      <div id="message"></div>
+    </div>
+  </div>
 
-    <style lang="scss">
-        @import 'https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css';
-        #fileInput{
-            display: none;
-        }
-        html, body{
-        background-color: #3f3939;
-        background-position: center;
-        background-size: cover;
-        height: 100%;
-        margin: 0;
-        }
-        .main-button-text{
-        font-size: 2rem;
-        font-weight: 600;
-        color: rgb(255, 255, 255);
-        }
-        .circle-button-main{
-        width: 300px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #355736;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #518975d2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transition: all 0.3s ease;
-        transform: scale(1);
-        }
-        .circle-button-main:hover{
-        width: 300px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #548d58;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #75c7acd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(1.1);
-        }
-        .circle-button-main:active{
-        width: 300px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #264028;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #33574bd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(0.8);
+  <!-- Скрипт для автоскачивания PDF -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('uploadForm');
+      const fileInput = document.getElementById('fileInput');
+      const msg = document.getElementById('message');
+
+      // При выборе файла сразу отправляем форму
+      fileInput.addEventListener('change', () => form.dispatchEvent(new Event('submit')));
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!fileInput.files.length) {
+          msg.textContent = 'Вы не выбрали файл!';
+          msg.className = 'error';
+          return;
         }
 
-        .circle-button-load{
-        width: 200px;
-        height: 100px;
-        border-width: 0.5em;
-        border-color: #355736;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #518975d2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transition: all 0.3s ease;
-        transform: scale(1);
-        }
-        .circle-button-load:hover{
-        width: 200px;
-        height: 100px;
-        border-width: 0.5em;
-        border-color: #548d58;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #75c7acd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(1.1);
-        }
-        .circle-button-load:active{
-        width: 200px;
-        height: 100px;
-        border-width: 0.5em;
-        border-color: #264028;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #33574bd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(0.8);
-        }
+        msg.textContent = 'Анализируем...';
+        msg.className = '';
 
-        .circle-button-download{
-        width: 250px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #355736;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #518975d2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transition: all 0.3s ease;
-        transform: scale(1);
-        }
-        .circle-button-download:hover{
-        width: 250px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #548d58;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #75c7acd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(1.1);
-        }
-        .circle-button-download:active{
-        width: 250px;
-        height: 150px;
-        border-width: 0.5em;
-        border-color: #264028;
-        border-style: solid;
-        border-radius: 30px;
-        background-color: #33574bd2;
-        font-size: 1rem;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 24px;
-        transform: scale(0.8);
-        }
+        const fd = new FormData();
+        fd.append('file', fileInput.files[0]);
 
+        try {
+          const res = await fetch('/upload/', {
+            method: 'POST',
+            body: fd,
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+          });
 
-        .container{
-        width: 100vw;
-        height: 100%;
-        display: grid;
-        justify-content: center;
-        column-count: 1;
-        row-gap: 1px;
-        }
-        .working-space{
-        display: grid;
-        justify-content: center;
-        align-items: center;
-        place-items: center;
-        row-gap: 1px;
-        }
+          if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(txt || res.statusText);
+          }
 
-        .centered-title{
-        text-align: center;
-        font-size: 3rem;
-        font-weight: 700;
-        color: aqua;
+          const blob = await res.blob();
+          const ct = res.headers.get('content-type') || '';
+          if (!ct.includes('application/pdf')) {
+            const txt = await blob.text();
+            throw new Error(txt || 'Не PDF');
+          }
+
+          // Скачиваем PDF
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'report.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+
+          msg.textContent = '✅ Успешно! Отчёт скачивается.';
+          msg.className = 'success';
+        } catch (err) {
+          console.error(err);
+          msg.textContent = 'Ошибка: ' + err.message;
+          msg.className = 'error';
         }
-        .status-text{
-        text-align: center;
-        font-size: 1rem;
-        font-weight: 200;
-        color: rgb(255, 255, 255);
-        }
-        .error-text{
-        text-align: center;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: rgb(121, 0, 0);
-        }
-        .file-panel{
-            width: 700px;
-            height: 200px;
-            border-width: 0.3em;
-            border-color: rgb(38, 38, 38);
-            border-style: solid;
-            border-radius: 30px;
-            background-color: #a0a0a0b7;
-            display: grid;
-            align-items: center;
-            place-items: center;
-        }
-        .settings-text{
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: rgb(234, 234, 234);
-        }
-        .settings-text-output{
-            text-align: left;
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: rgb(234, 234, 234);
-        }
-        .results-panel{
-            width: 700px;
-            min-height: 100px;
-            overflow: auto;
-            border-width: 0.3em;
-            border-color: rgb(38, 38, 38);
-            border-style: solid;
-            border-radius: 30px;
-            background-color: #a0a0a0b7;
-            display: grid;
-            align-items: top;
-            place-items: top;
-        }
-        .analysis-data-panel{
-            width: 600px;
-            min-height: 100px;
-            margin-left: 20px;
-            overflow: auto;
-            display: grid;
-            align-items: left;
-            place-items: left;
-        }
-        .analysis-text-header{
-            text-align: left;
-            font-size: 1.9rem;
-            font-weight: 500;
-            color: rgb(234, 234, 234);
-        }
-        .analysis-text-output{
-            text-align: left;
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: rgb(234, 234, 234);
-        }
-        .text-output-header{
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 500;
-            color: rgb(85, 83, 83);
-        }
-        .file-panel-2{
-            width: 700px;
-            height: 200px;
-            border-width: 0.3em;
-            border-color: rgb(38, 38, 38);
-            border-style: solid;
-            border-radius: 30px;
-            background-color: #a0a0a0b7;
-            display: grid;
-            align-items: left;
-            place-items: right;
-        }
-        .file-panel-3{
-            width: 700px;
-            height: 700px;
-            border-width: 0.3em;
-            border-color: rgb(97, 66, 236);
-            border-style: solid;
-            background-color: #aae7ffb7;
-            display: grid;
-            align-items: left;
-            place-items: left;
-        }
-        
-    </style>
+      });
+    });
+  </script>
+</body>
 </html>
