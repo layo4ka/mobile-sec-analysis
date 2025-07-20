@@ -65,7 +65,7 @@ def get_results_report(status, file_hash):
             for x in respJson['permissions']:
                 perm={"Имя разрешения":x, "Безопасность разрешения":respJson['permissions'].get(x).get('status')}
                 permissions.update(perm)
-            result['Разрешения'].update(permissions)
+            result.setdefault('Разрешения', {}).update(permissions)
 
             trackers={}
             trackers.update({"Всего трекеров":respJson['trackers']['total_trackers'], "Засечённых трекеров":respJson['trackers']['detected_trackers']})
@@ -99,15 +99,3 @@ def get_report_pdf(status, file_hash):
         return status
     
 
-#Фигня какая-то честно говоря, но удалять не буду, пусть здесь пока побудет.
-
-# def get_scan_results(status, file_hash):
-#     if(status=="Done"):
-#         headers = {"Authorization": API_KEY}
-#         uploadURL = f"{MOBSF_URL}/api/v1/search"
-#         toPost = {"hash":file_hash}
-#         response = requests.post(uploadURL, data=toPost, headers=headers)
-#         if response.status_code == 200:
-#             return json.dumps(response.json, indent=4, ensure_ascii=False)
-#     else:
-#         return f"Ошибка: {response.status_code}; {response.text}"
