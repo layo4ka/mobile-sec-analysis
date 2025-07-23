@@ -1,31 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mobile Security Service</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <style>
-    /* Общие стили */
-    html, body {
-      background-color: #3f3939;
-      height: 100%;
-      margin: 0;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
+
       display: flex;
       flex-direction: column;
       align-items: center;
+      place-items: center;
+      animation-name: slideContainer;
+      animation-fill-mode: forwards;
+      animation-delay: 1.5s;
+      opacity: 0;
+      animation-duration: 2s;
     }
     .centered-title {
+      font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
       text-align: center;
       font-size: 3rem;
       font-weight: 700;
       color: aqua;
       margin-bottom: 2rem;
+      animation-duration: 2s;
+      animation-name: slideTitle1;
+      
+    }
+    .button-text{
+      font-family: fantasy;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 500;
+      color: white;
     }
 
     /* Кнопки */
@@ -34,8 +34,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 300px;
-      height: 150px;
+      min-width: 150px;
+      min-height: 150px;
+      overflow: auto;
       border: 0.5em solid #355736;
       border-radius: 30px;
       background-color: #518975d2;
@@ -45,38 +46,103 @@
     .circle-button-main:hover {
       transform: scale(1.05);
       background-color: #75c7acd2;
+      border: 0.5em solid #47784a;
     }
 
     /* Сообщения */
     #message {
       margin-top: 1.5rem;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       text-align: center;
     }
-    .error { color: #e74c3c; }
-    .success { color: #2ecc71; }
+    .error { color: #79190e; }
+    .success { color: #17763f; }
 
-    /* Панель */
+    /* Панели */
     .working-space {
       width: 100%;
       background-color: #a0a0a0b7;
       padding: 1.5rem;
       border-radius: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      place-items: center;
+    }
+    .android-logo{
+      width: 13%;
+      height: 25%;
+      animation-name: logoMove1;
+      position: absolute;
+      animation-duration: 1.6s;
+      animation-fill-mode: forwards;
+    }
+    .apple-logo{
+      width: 13%;
+      height: 25%;
+      animation-name: logoMove2;
+      position: absolute;
+      animation-duration: 1.6s;
+      animation-delay: 0.1s;
+      animation-fill-mode: forwards;
+    }
+
+
+    /* Анимации */
+    @keyframes slideTitle1{
+      from{
+        margin-top: 30%;
+        opacity: 0;
+        color: rgba(0, 255, 255, 0);
+      }
+      to{
+        opacity: 1;
+        margin-top: 0%;
+        color: aqua;
+      }
+    }
+    @keyframes slideContainer{
+      from{
+        opacity: 0;
+      }
+      to{
+        opacity: 1;
+      }
+    }
+    @keyframes logoMove1{
+      from{
+        margin-left: 0%;
+        transform: rotate(0deg);
+      }
+      to{
+        margin-left: 50%;
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes logoMove2{
+      from{
+        margin-left: 0%;
+        transform: rotate(0deg);
+      }
+      to{
+        margin-left: 35%;
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
 <body>
+  <div class="centered-title">
+    Проверь приложение на безопасность!
+  </div>
   <div class="container">
-    <div class="centered-title">Проверь приложение на вирусняк прямо сейчас!</div>
     <div class="working-space">
       <!-- Форма загрузки -->
       <form id="uploadForm" enctype="multipart/form-data">
-        {% csrf_token %}
+        <!-- {% csrf_token %} -->
         <input id="fileInput" name="file" type="file" accept=".apk,.ipa">
         <button type="button" class="circle-button-main" onclick="fileInput.click()">
-          Выбрать файл
+          <h1 class="button-text">Выбрать файл</h1>
         </button>
       </form>
 
@@ -84,6 +150,8 @@
       <div id="message"></div>
     </div>
   </div>
+  <img src="Images/Android_robot.svg.png" class="android-logo">
+  <img src="Images/appleLogo.png" class="apple-logo">
 
   <!-- Скрипт для автоскачивания PDF -->
   <script>
@@ -150,3 +218,4 @@
   </script>
 </body>
 </html>
+
