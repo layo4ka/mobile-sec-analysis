@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from file import views
 
 urlpatterns = [
     path('', views.index, name='index'),
     path('upload/', views.upload_file, name='upload'),
-    path('shitty/', views.some_page, name='shitty'),
     path('admin/', admin.site.urls),
-    path('api/v1/', include('djoser.urls')),
-    path('api/v1/', include('djoser.urls.authtoken'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
